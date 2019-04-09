@@ -15,24 +15,6 @@ class WeixinController extends Controller
         $objxml = simplexml_load_string($str);
 
         file_put_contents("/tmp/weixin.log", $str, FILE_APPEND);
-
-        $MsgType = $objxml->MsgType;
-        $MediaId = $objxml->MediaId;
-        if($MsgType=='text'){
-            file_put_contents("/tmp/aaaab.log", $str, FILE_APPEND);
-            $content = $objxml->Content;
-            $openid = $objxml->FromUserName;
-            $createtime = $objxml->CreateTime;
-        }else if($MsgType=='image'){
-            $access = $this->accessTokenbb();
-            $url = "https://api.weixin.qq.com/cgi-bin/media/get?access_token=$access&media_id=$MediaId";
-            $time = time();
-            $obj = new \curl();
-            $objget = $obj->sendGet($url);
-
-            file_put_contents("/tmp/$time.jpg", $objget, FILE_APPEND);
-
-        }
     }
     public function accessToken(){
         //Cache::pull('access');exit;
