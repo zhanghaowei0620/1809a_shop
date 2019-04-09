@@ -11,7 +11,6 @@ class WeixinController extends Controller
     public function xmladd(Request $request)
     {
         //echo $request->input('echostr');
-        $con = mysqli_connect('127.0.0.1', 'root', '123456', 'test');
         $str = file_get_contents("php://input");
         $objxml = simplexml_load_string($str);
 
