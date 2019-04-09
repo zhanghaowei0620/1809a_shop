@@ -21,20 +21,9 @@ class WeixinController extends Controller
         $MediaId = $objxml->MediaId;
         if($MsgType=='text'){
             file_put_contents("/tmp/aaaab.log", $str, FILE_APPEND);
-
-
             $content = $objxml->Content;
             $openid = $objxml->FromUserName;
             $createtime = $objxml->CreateTime;
-
-            $arr = [
-                'content'=>$content,
-                'openid'=>$openid,
-                'createtime'=>$createtime
-            ];
-
-            $info =DB::table('content')->insert($arr);
-
         }else if($MsgType=='image'){
             $access = $this->accessTokenbb();
             $url = "https://api.weixin.qq.com/cgi-bin/media/get?access_token=$access&media_id=$MediaId";
