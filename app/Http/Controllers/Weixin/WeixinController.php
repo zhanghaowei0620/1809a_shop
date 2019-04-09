@@ -10,10 +10,10 @@ class WeixinController extends Controller
 {
     public function xmladd(Request $request)
     {
-        echo $request->input('echostr');
+        //echo $request->input('echostr');
         $str = file_get_contents("php://input");
         $objxml = simplexml_load_string($str);
-        file_put_contents("/tmp/1809a.log", $str, FILE_APPEND);
+        file_put_contents("/tmp/1809a_shop.log", $str, FILE_APPEND);
     }
     public function accessToken(){
         //Cache::pull('access');exit;
