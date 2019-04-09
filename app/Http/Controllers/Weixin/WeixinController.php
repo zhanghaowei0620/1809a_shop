@@ -11,9 +11,40 @@ class WeixinController extends Controller
     public function xmladd(Request $request)
     {
         //echo $request->input('echostr');
+        $con = mysqli_connect('127.0.0.1', 'root', '123456', 'test');
         $str = file_get_contents("php://input");
         $objxml = simplexml_load_string($str);
-        file_put_contents("/tmp/1809a.log",$str,FILE_APPEND);
+
+        file_put_contents("/tmp/weixin.log", $str, FILE_APPEND);
+
+        $MsgType = $objxml->MsgType;
+        $MediaId = $objxml->MediaId;
+        if($MsgType=='text'){
+            file_put_contents("/tmp/aaaab.log", $str, FILE_APPEND);
+
+
+            $content = $objxml->Content;
+            $openid = $objxml->FromUserName;
+            $createtime = $objxml->CreateTime;
+
+            $arr = [
+                'content'=>$content,
+                'openid'=>$openid,
+                'createtime'=>$createtime
+            ];
+
+            $info =DB::table('content')->insert($arr);
+
+        }else if($MsgType=='image'){
+            $access = $this->accessTokenbb();
+            $url = "https://api.weixin.qq.com/cgi-bin/media/get?access_token=$access&media_id=$MediaId";
+            $time = time();
+            $obj = new \curl();
+            $objget = $obj->sendGet($url);
+
+            file_put_contents("/tmp/$time.jpg", $objget, FILE_APPEND);
+
+        }
     }
     public function accessToken(){
         //Cache::pull('access');exit;
