@@ -14,7 +14,7 @@ class WeixinController extends Controller
         $str = file_get_contents("php://input");
         $objxml = simplexml_load_string($str);
 
-        file_put_contents("tmp/1809_weixin.log", $str, FILE_APPEND);
+        file_put_contents("/tmp/1809_weixin.log", $str, FILE_APPEND);
         //echo "success";
     }
     public function accessToken(){
