@@ -37,11 +37,9 @@ class WeixinController extends Controller
         //echo "success";
 
         $MsgType = $objxml->MsgType;
-        $MediaId = $objxml->MediaId;
+        var_dump($MsgType);exit;
         if($MsgType=='text'){
             file_put_contents("/tmp/test.log", $str, FILE_APPEND);
-
-
             $access = $this->accessToken();
             $url = "https://api.weixin.qq.com/cgi-bin/user/get?access_token=$access";
             $info = file_get_contents($url);
