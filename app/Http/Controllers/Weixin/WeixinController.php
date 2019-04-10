@@ -35,7 +35,7 @@ class WeixinController extends Controller
 
         file_put_contents("/tmp/1809_weixin.log", $str, FILE_APPEND);
         //echo "success";
-        var_dump($objxml);exit;
+        var_dump($str);exit;
         $MsgType = $objxml->MsgType;
         //var_dump($MsgType);exit;
         if($MsgType=='text'){
