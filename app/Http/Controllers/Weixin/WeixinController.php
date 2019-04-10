@@ -32,43 +32,39 @@ class WeixinController extends Controller
         //echo $request->input('echostr');
         $str = file_get_contents("php://input");
         $objxml = simplexml_load_string($str);
-
         file_put_contents("/tmp/1809_weixin.log", $str, FILE_APPEND);
-        //echo "success";
-        var_dump($str);exit;
-        $MsgType = $objxml->MsgType;
-        //var_dump($MsgType);exit;
-        if($MsgType=='text'){
-            file_put_contents("/tmp/test.log", $str, FILE_APPEND);
-            $access = $this->accessToken();
-            $url = "https://api.weixin.qq.com/cgi-bin/user/get?access_token=$access";
-            $info = file_get_contents($url);
-            $arrInfo = json_decode($info,true);
-            $data = $arrInfo['data'];
-            //var_dump($data);exit;
-            $openid = $data['openid'];
-            foreach($openid as $k=>$v){
-                $userUrl="https://api.weixin.qq.com/cgi-bin/user/info?access_token=$access&openid=$v&lang=zh_CN";
-                $userAccessInfo=file_get_contents($userUrl);
-                $userInfo=json_decode($userAccessInfo,true);
-                $datainfos[]=$userInfo;
-            }
-            var_dump($datainfos);exit;
-
-
-            $content = $objxml->Content;
-            $openid = $objxml->FromUserName;
-            $createtime = $objxml->CreateTime;
-
-            $arr = [
-                'content'=>$content,
-                'openid'=>$openid,
-                'createtime'=>$createtime
-            ];
-
-            $info =DB::table('content')->insert($arr);
-
-        }
+//        $MsgType = $objxml->MsgType;
+//        if($MsgType=='text'){
+//            file_put_contents("/tmp/test.log", $str, FILE_APPEND);
+//            $access = $this->accessToken();
+//            $url = "https://api.weixin.qq.com/cgi-bin/user/get?access_token=$access";
+//            $info = file_get_contents($url);
+//            $arrInfo = json_decode($info,true);
+//            $data = $arrInfo['data'];
+//            //var_dump($data);exit;
+//            $openid = $data['openid'];
+//            foreach($openid as $k=>$v){
+//                $userUrl="https://api.weixin.qq.com/cgi-bin/user/info?access_token=$access&openid=$v&lang=zh_CN";
+//                $userAccessInfo=file_get_contents($userUrl);
+//                $userInfo=json_decode($userAccessInfo,true);
+//                $datainfos[]=$userInfo;
+//            }
+//            //var_dump($datainfos);exit;
+//
+//
+//            $content = $objxml->Content;
+//            $openid = $objxml->FromUserName;
+//            $createtime = $objxml->CreateTime;
+//
+//            $arr = [
+//                'content'=>$content,
+//                'openid'=>$openid,
+//                'createtime'=>$createtime
+//            ];
+//
+//            $info =DB::table('content')->insert($arr);
+//
+//        }
     }
 
  /**
