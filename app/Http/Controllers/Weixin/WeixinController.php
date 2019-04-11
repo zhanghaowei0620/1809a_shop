@@ -85,10 +85,11 @@ class WeixinController extends Controller
                 $access = $this->accessToken();
                 $url = "https://api.weixin.qq.com/cgi-bin/media/get?access_token=$access&media_id=$MediaId";
                 $time = time();
-                $obj = new \curl();
-                $objget = $obj->sendGet($url);
+                $objurl = new \Client();
+                $response = $objurl->request('POST',$url);
+                $res_str = $response->getBody();
 
-                file_put_contents("/tmp/$time.jpg", $objget, FILE_APPEND);
+                file_put_contents("/tmp/$time.jpg", $res_str, FILE_APPEND);
 
             }else {
                 $time = time();
@@ -138,7 +139,7 @@ class WeixinController extends Controller
 
         $strJson = json_encode($arr,JSON_UNESCAPED_UNICODE);
         $objurl = new \Client();
-        $response = $$objurl->request('POST',$url,[
+        $response = $objurl->request('POST',$url,[
            'boby' => $strJson
         ]);
         $res_str = $response->getBody();
