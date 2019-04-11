@@ -10,7 +10,7 @@ use Illuminate\Support\Facades\DB;
 class WeixinController extends Controller
 {
     public function accessToken(){
-        Cache::pull('access');exit;
+        //Cache::pull('access');exit;
         $access = Cache('access');
         if(empty($access)){
             $appid = "wx51db63563c238547";
