@@ -42,6 +42,10 @@ class WeixinController extends Controller
         $Event = $objxml->Event;
         $FromUserName = $objxml->FromUserName;
         $ToUserName = $objxml->ToUserName;
+        $MsgType = $objxml->MsgType;
+        $MediaId = $objxml->MediaId;
+
+
         $access = $this->accessToken();
         $userUrl = "https://api.weixin.qq.com/cgi-bin/user/info?access_token=$access&openid=$FromUserName&lang=zh_CN";
         $userAccessInfo = file_get_contents($userUrl);
@@ -77,7 +81,16 @@ class WeixinController extends Controller
                    </xml>";
                 echo $xmlStr;
 
-            } else {
+            }else if($MsgType=='image'){
+                $access = $this->accessToken();
+                $url = "https://api.weixin.qq.com/cgi-bin/media/get?access_token=$access&media_id=$MediaId";
+                $time = time();
+                $obj = new \curl();
+                $objget = $obj->sendGet($url);
+
+                file_put_contents("/tmp/$time.jpg", $objget, FILE_APPEND);
+
+            }else {
                 $time = time();
                 $content = "欢迎" . $name . "回来";
                 $xmlStr = "
