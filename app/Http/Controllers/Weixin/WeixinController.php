@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
+use GuzzleHttp\Client;
 
 class WeixinController extends Controller
 {
@@ -92,5 +93,42 @@ class WeixinController extends Controller
 
         }
 
+    }
+
+    /**自定义菜单添加*/
+    public function createadd(Request $request){
+        $access = $this->accessToken();
+        $url = "https://api.weixin.qq.com/cgi-bin/menu/create?access_token=$access";
+        $arr = array(
+            'button'=>array(
+                array(
+                    "name"=>"xxx",
+                    "type"=>"click",
+                    "key"=>"aaa",
+                    "sub_button"=>array(
+                        array(
+                            "type"=>"pic_weixin",
+                            "name"=>"发送图片",
+                            "key"=>"aaa",
+                        ),
+                    ),
+                ),
+                array(
+                    "name"=>"dadada",
+                    "type"=>"view",
+                    "url"=>"https://www.baidu.com"
+                ),
+            ),
+        );
+
+
+
+        $strJson = json_encode($arr,JSON_UNESCAPED_UNICODE);
+        $objurl = new \Client();
+        $response = $$objurl->request('POST',$url,[
+           'boby' => $strJson
+        ]);
+        $res_str = $response->getBody();
+        var_dump($res_str);
     }
 }
