@@ -40,6 +40,7 @@ class WeixinController extends Controller
         $FromUserName = $objxml->FromUserName;
         $ToUserName = $objxml->ToUserName;
         $access = $this->accessToken();
+<<<<<<< HEAD
         $userUrl="https://api.weixin.qq.com/cgi-bin/user/info?access_token=$access&openid=$FromUserName&lang=zh_CN";
         $userAccessInfo=file_get_contents($userUrl);
         $userInfo=json_decode($userAccessInfo,true);
@@ -51,16 +52,46 @@ class WeixinController extends Controller
         //var_dump($MsgType);
         if($Event='subscribe'){
             $data=DB::table('wx')->where('openid',$openid1)->count();
+=======
+        $url = "https://api.weixin.qq.com/cgi-bin/user/get?access_token=$access";
+        $info = file_get_contents($url);
+        $arrInfo = json_decode($info,true);
+        $data = $arrInfo['data'];
+        //var_dump($data);exit;
+        $openid = $data['openid'];
+        foreach($openid as $k=>$v){
+            $userUrl="https://api.weixin.qq.com/cgi-bin/user/info?access_token=$access&openid=$v&lang=zh_CN";
+            $userAccessInfo=file_get_contents($userUrl);
+            $userInfo=json_decode($userAccessInfo,true);
+            $datainfos[]=$userInfo;
+        }
+        var_dump($datainfos);exit;
+
+
+
+        //var_dump($MsgType);
+        if($Event='subscribe'){
+            $data=DB::table('wx')->where('openid',$FromUserName)->count();
+>>>>>>> 197d1184443de9bc7298691fba9659af5b5aef65
             //print_r($data);die;
             if($data=='0'){
                 $weiInfo=[
                     'name'=>$name,
+<<<<<<< HEAD
                     'sex'=>$sex,
                     'img'=>$headimgurl,
                     'openid'=>$openid1,
                     'time'=>time()
                 ];
                 //print_r($weiInfo);exit;
+=======
+                    'sex'=>$info['sex'],
+                    'img'=>$info['headimgurl'],
+                    'openid'=>$info['openid'],
+                    'time'=>time()
+                ];
+                //print_r($weiInfo);
+>>>>>>> 197d1184443de9bc7298691fba9659af5b5aef65
                 DB::table('wx')->insert($weiInfo);
 
                 //回复消息
@@ -95,6 +126,7 @@ class WeixinController extends Controller
 
     }
 
+<<<<<<< HEAD
     /**自定义菜单添加*/
     public function createadd(Request $request){
         $access = $this->accessToken();
@@ -127,6 +159,71 @@ class WeixinController extends Controller
         //$strJson = json_encode($arr,JSON_UNESCAPED_UNICODE);
 //        $bol = file_get_contents($url);
 //        var_dump($bol);
+=======
+
+   /**
+   //获取用户的基本信息
+   public function userInfo(){
+   $access = $this->accessToken();
+   $url = "https://api.weixin.qq.com/cgi-bin/user/get?access_token=$access";
+   $info = file_get_contents($url);
+   $arrInfo = json_decode($info,true);
+   $data = $arrInfo['data'];
+   //var_dump($data);exit;
+   $openid = $data['openid'];
+   foreach($openid as $k=>$v){
+   $userUrl="https://api.weixin.qq.com/cgi-bin/user/info?access_token=$access&openid=$v&lang=zh_CN";
+   $userAccessInfo=file_get_contents($userUrl);
+   $userInfo=json_decode($userAccessInfo,true);
+   $datainfos[]=$userInfo;
+   }
+
+   //return view('user.userlist',['userInfo'=>$datainfos]);
+   return $datainfos;
+   }
+    */
+
+
+    /**自定义菜单添加*/
+    public function createadd(Request $request){
+        $access = $this->accessToken();
+        $url = "https://api.weixin.qq.com/cgi-bin/menu/create?access_token=$access";
+        //$url = "https://api.weixin.qq.com/cgi-bin/menu/delete?access_token=$access";
+        $arr = array(
+            'button'=>array(
+                array(
+                    "name"=>"xxx",
+                    "type"=>"click",
+                    "key"=>"aaa",
+                    "sub_button"=>array(
+                        array(
+                            "type"=>"pic_weixin",
+                            "name"=>"发送图片",
+                            "key"=>"aaa",
+                        ),
+                    ),
+                ),
+                array(
+                    "name"=>"dadada",
+                    "type"=>"view",
+                    "url"=>"https://www.baidu.com"
+                ),
+            ),
+        );
+
+
+        $context = stream_context_create(array(
+            'http' => array(
+                "method"=>"POST",
+                "header"=>'Content-type:application/x-www-form-urlencoded',
+                "content"=>http_build_query($arr),
+                "timeout"=>20
+            )
+        ));
+        $strJson = json_encode($context,JSON_UNESCAPED_UNICODE);
+        $bol = file_get_contents($url,'POST',$context);
+        var_dump($bol);
+>>>>>>> 197d1184443de9bc7298691fba9659af5b5aef65
     }
 }
 
