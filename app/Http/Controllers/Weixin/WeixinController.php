@@ -117,7 +117,7 @@ class WeixinController extends Controller
             $time = time();
             $res_str = file_get_contents($url);
 
-            file_put_contents("/tmp/$time.jpg", $res_str, FILE_APPEND);
+            file_put_contents("/wwwroot/1809a_shop/price/$time.jpg", $res_str, FILE_APPEND);
 
         }
 
