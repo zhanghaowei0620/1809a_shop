@@ -121,8 +121,15 @@ class WeixinController extends Controller
             $time = time();
             $res_str = file_get_contents($url);
 
-            file_put_contents("/tmp/$time.jpg", $res_str, FILE_APPEND);
+            file_put_contents("/tmp/image/$time.jpg", $res_str, FILE_APPEND);
 
+        }else if($MsgType=='voice'){
+            $access = $this->accessToken();
+            $vourl = "https://api.weixin.qq.com/cgi-bin/media/get?access_token=$access&media_id=$MediaId";
+            $votime = time();
+            $res_str = file_get_contents($vourl);
+
+            file_put_contents("/tmp/voice/$votime.mp3", $res_str, FILE_APPEND);
         }
 
     }
