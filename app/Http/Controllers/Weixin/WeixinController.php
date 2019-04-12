@@ -159,6 +159,7 @@ class WeixinController extends Controller
            'body' => $strJson
         ]);
         $res_str = $response->getBody();
-        var_dump($res_str);
+        //var_dump($res_str);
+        return $res_str;
     }
 }
