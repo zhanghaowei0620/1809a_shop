@@ -95,7 +95,11 @@ class WeixinController extends Controller
                 echo $xmlStr;
             }
 
-        }else if($MsgType=='text'){
+        }
+
+
+
+        if($MsgType=='text'){
             file_put_contents("/tmp/aaaab.log", $str, FILE_APPEND);
 
 
@@ -117,7 +121,7 @@ class WeixinController extends Controller
             $time = time();
             $res_str = file_get_contents($url);
 
-            file_put_contents("/wwwroot/1809a_shop/price/$time.jpg", $res_str, FILE_APPEND);
+            file_put_contents("/tmp/$time.jpg", $res_str, FILE_APPEND);
 
         }
 
