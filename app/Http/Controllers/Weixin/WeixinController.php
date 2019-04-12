@@ -154,9 +154,9 @@ class WeixinController extends Controller
         );
 
         $strJson = json_encode($arr,JSON_UNESCAPED_UNICODE);
-        $objurl = new \Client();
+        $objurl = new Client();
         $response = $objurl->request('POST',$url,[
-           'boby' => $strJson
+           'body' => $strJson
         ]);
         $res_str = $response->getBody();
         var_dump($res_str);
