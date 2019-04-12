@@ -55,7 +55,7 @@ class WeixinController extends Controller
         $sex = $userInfo['sex'];
         $headimgurl = $userInfo['headimgurl'];
         $openid1 = $userInfo['openid'];
-        if ($Event = 'subscribe') {
+        if ($Event == 'subscribe') {
             $data = DB::table('wx')->where('openid', $FromUserName)->count();
             //print_r($data);die;
             if ($data == '0') {
