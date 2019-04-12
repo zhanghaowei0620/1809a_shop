@@ -95,8 +95,7 @@ class WeixinController extends Controller
                 echo $xmlStr;
             }
 
-        }
-        if($MsgType=='text'){
+        }else if($MsgType=='text'){
             file_put_contents("/tmp/aaaab.log", $str, FILE_APPEND);
 
 
