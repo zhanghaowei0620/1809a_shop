@@ -81,16 +81,6 @@ class WeixinController extends Controller
                    </xml>";
                 echo $xmlStr;
 
-            }else if($MsgType=='image'){
-                $access = $this->accessToken();
-                $url = "https://api.weixin.qq.com/cgi-bin/media/get?access_token=$access&media_id=$MediaId";
-                $time = time();
-                $objurl = new \Client();
-                $response = $objurl->request('POST',$url);
-                $res_str = $response->getBody();
-
-                file_put_contents("/tmp/$time.jpg", $res_str, FILE_APPEND);
-
             }else {
                 $time = time();
                 $content = "欢迎" . $name . "回来";
@@ -104,6 +94,34 @@ class WeixinController extends Controller
                    </xml>";
                 echo $xmlStr;
             }
+
+        }
+        if($MsgType=='text'){
+            file_put_contents("/tmp/aaaab.log", $str, FILE_APPEND);
+
+
+            $content = $objxml->Content;
+            $openid = $objxml->FromUserName;
+            $createtime = $objxml->CreateTime;
+
+            $arr = [
+                'content'=>$content,
+                'openid'=>$openid,
+                'createtime'=>$createtime
+            ];
+
+            $info =DB::table('content')->insert($arr);
+
+        }
+        else if($MsgType=='image'){
+            $access = $this->accessToken();
+            $url = "https://api.weixin.qq.com/cgi-bin/media/get?access_token=$access&media_id=$MediaId";
+            $time = time();
+            $objurl = new \Client();
+            $response = $objurl->request('POST',$url);
+            $res_str = $response->getBody();
+
+            file_put_contents("/tmp/$time.jpg", $res_str, FILE_APPEND);
 
         }
 
@@ -134,8 +152,6 @@ class WeixinController extends Controller
                 ),
             ),
         );
-
-
 
         $strJson = json_encode($arr,JSON_UNESCAPED_UNICODE);
         $objurl = new \Client();
