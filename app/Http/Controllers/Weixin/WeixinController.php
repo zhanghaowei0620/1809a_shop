@@ -117,7 +117,7 @@ class WeixinController extends Controller
             $access = $this->accessToken();
             $url = "https://api.weixin.qq.com/cgi-bin/media/get?access_token=$access&media_id=$MediaId";
             $time = time();
-            $objurl = new \Client();
+            $objurl = new Client();
             $response = $objurl->request('POST',$url);
             $res_str = $response->getBody();
 
