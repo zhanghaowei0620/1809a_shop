@@ -81,7 +81,7 @@ class WeixinController extends Controller
                    </xml>";
                 echo $xmlStr;
 
-            }else {
+            }else{
                 $time = time();
                 $content = "欢迎" . $name . "回来";
                 $xmlStr = "
@@ -112,8 +112,7 @@ class WeixinController extends Controller
 
             $info =DB::table('content')->insert($arr);
 
-        }
-        else if($MsgType=='image'){
+        }else if($MsgType=='image'){
             $access = $this->accessToken();
             $url = "https://api.weixin.qq.com/cgi-bin/media/get?access_token=$access&media_id=$MediaId";
             $time = time();
