@@ -233,4 +233,39 @@ class WeixinController extends Controller
         //var_dump($res_str);
         return $res_str;
     }
+    /**openid群发*/
+    public function openiddo(Request $request){
+        $objurl = new Client();
+        $access = $this->accessToken();
+        //获取测试号下所有用户的openid
+        $userurl = "https://api.weixin.qq.com/cgi-bin/user/get?access_token=$access";
+        $info = file_get_contents($userurl);
+        $arrInfo = json_decode($info, true);
+        //var_dump($arrInfo);exit;
+        $data = $arrInfo['data'];
+        $openid = $data['openid'];
+        //调用接口根据openid群发
+        $msgurl = "https://api.weixin.qq.com/cgi-bin/message/mass/send?access_token=$access";
+//        $openid = [
+//            'o4rK85pje4sMiHfs9F9aFmTvDn3U',
+//            'o4rK85pje4sMiHfs9F9aFmTvDn3U'
+//        ];
+        $content = "你好";
+        $arr = array(
+            'touser'=>$openid,
+            'msgtype'=>"text",
+            'text'=>[
+                'content'=>$content,
+            ],
+        );
+        //print_r($arr);
+        $strjson = json_encode($arr,JSON_UNESCAPED_UNICODE);
+        $objurl = new Client();
+        $response = $objurl->request('POST',$msgurl,[
+            'body' => $strjson
+        ]);
+        $res_str = $response->getBody();
+        //var_dump($res_str);
+        return $res_str;
+    }
 }
