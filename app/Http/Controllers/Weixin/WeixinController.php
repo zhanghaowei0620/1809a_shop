@@ -7,6 +7,9 @@ use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 use GuzzleHttp\Client;
+use GuzzleHttp\Psr7\Uri;
+use Storage;
+
 
 class WeixinController extends Controller
 {
@@ -29,11 +32,10 @@ class WeixinController extends Controller
 
         return $access;
     }
-
     public function xmladd(Request $request)
     {
+        $client = new Client();
         //echo $request->input('echostr');
-        $con = mysqli_connect('127.0.0.1', 'root', '123456', 'test');
         $str = file_get_contents("php://input");
         $objxml = simplexml_load_string($str);
         //var_dump($objxml);
@@ -56,7 +58,7 @@ class WeixinController extends Controller
         $headimgurl = $userInfo['headimgurl'];
         $openid1 = $userInfo['openid'];
         if ($Event == 'subscribe') {
-            $data = DB::table('wx')->where('openid', $FromUserName)->count();
+            $data = DB::table('kaoshi')->where('openid', $FromUserName)->count();
             //print_r($data);die;
             if ($data == '0') {
                 $weiInfo = [
@@ -66,7 +68,7 @@ class WeixinController extends Controller
                     'openid' => $openid1,
                     'time' => time()
                 ];
-                DB::table('wx')->insert($weiInfo);
+                DB::table('kaoshi')->insert($weiInfo);
 
                 //回复消息
                 $time = time();
@@ -118,22 +120,38 @@ class WeixinController extends Controller
         }else if($MsgType=='image'){
             $access = $this->accessToken();
             $url = "https://api.weixin.qq.com/cgi-bin/media/get?access_token=$access&media_id=$MediaId";
-            $time = time();
-            $res_str = file_get_contents($url);
+            $response = $client->get(new Uri($url));
+            $headers = $response->getHeaders();
+            $file_info = $headers['Content-disposition'][0];
+            $file_name = rtrim(substr($file_info, -20), '"');
+            $new_file_name = "/tmp/image/" . date("Y-m-d H:i:s") . $file_name;
 
-            file_put_contents("/tmp/image/$time.jpg", $res_str, FILE_APPEND);
+            $rs = Storage::put($new_file_name, $response->getBody());
+            //print_r($rs);exit;
+//            $time = time();
+//            $res_str = file_get_contents($url);
+//
+//            file_put_contents("/tmp/image/$time.jpg", $res_str, FILE_APPEND);
+            if ($rs == '1') {
+                //echo '1111';exit;
+                $dataInfo = [
+                    "nickname" => $userInfo['nickname'],
+                    "openid" => $openid1,
+                    "img" => $new_file_name
+                ];
+                //var_dump($dataInfo);exit;
+                $imginfo = DB::table('image')->insert($dataInfo);
 
-        }else if($MsgType=='voice'){
-            $access = $this->accessToken();
-            $vourl = "https://api.weixin.qq.com/cgi-bin/media/get?access_token=$access&media_id=$MediaId";
-            $votime = time();
-            $res_str = file_get_contents($vourl);
+            } else if ($MsgType == 'voice') {
+                $access = $this->accessToken();
+                $vourl = "https://api.weixin.qq.com/cgi-bin/media/get?access_token=$access&media_id=$MediaId";
+                $votime = time();
+                $res_str = file_get_contents($vourl);
 
-            file_put_contents("/tmp/voice/$votime.mp3", $res_str, FILE_APPEND);
+                file_put_contents("/tmp/voice/$votime.mp3", $res_str, FILE_APPEND);
+            }
         }
-
     }
-
     /**自定义菜单添加*/
     public function createadd(Request $request){
         $access = $this->accessToken();
