@@ -102,7 +102,35 @@ class WeixinController extends Controller
 
 
         if($MsgType=='text'){
-            file_put_contents("/tmp/aaaab.log", $str, FILE_APPEND);
+            $city = explode('+',$objxml->Content)[0];
+            //echo 'city: '.$city;
+            $url = "https://free-api.heweather.net/s6/weather/now?key=HE1904161132041607&location=".$city;
+            $arr = json_decode(file_get_contents($url),true);
+            //echo '<pre>';print_r($arr);echo '</pre>';
+            $f1 = $arr['HeWeather6'][0]['basic']['location'];//城市
+            $wind_dir = $arr['HeWeather6'][0]['now']['wind_dir'];//风向
+            $wind_sc = $arr['HeWeather6'][0]['now']['wind_sc'];//风力
+            $tmp = $arr['HeWeather6'][0]['now']['tmp'];//温度
+            $hum = $arr['HeWeather6'][0]['now']['hum'];//湿度
+
+            $str = "城市: ".$f1."\n" . "风向: ".$wind_dir ."\n" ."风力：" .$wind_sc."\n" ."温度: ".$tmp."\n" . "湿度: " .$hum."\n";
+            $time = time();
+            $response_xml = "
+                <xml>
+                    <ToUserName><![CDATA[$FromUserName]]></ToUserName>
+                    <FromUserName><![CDATA[$ToUserName]]></FromUserName>
+                    <CreateTime>$time</CreateTime>
+                    <MsgType><![CDATA[text]]></MsgType>
+                    <Content><![CDATA[".$str."]]></Content>
+                </xml>
+                ";
+            echo $response_xml;
+
+
+
+
+
+
 
 
             $content = $objxml->Content;
@@ -117,7 +145,7 @@ class WeixinController extends Controller
 
             $info =DB::table('content')->insert($arr);
 
-        }else if($MsgType=='image'){
+        }else if($MsgType=='image') {
             $access = $this->accessToken();
             $url = "https://api.weixin.qq.com/cgi-bin/media/get?access_token=$access&media_id=$MediaId";
             $response = $client->get(new Uri($url));
@@ -142,13 +170,31 @@ class WeixinController extends Controller
                 //var_dump($dataInfo);exit;
                 $imginfo = DB::table('image')->insert($dataInfo);
 
-            } else if ($MsgType == 'voice') {
-                $access = $this->accessToken();
-                $vourl = "https://api.weixin.qq.com/cgi-bin/media/get?access_token=$access&media_id=$MediaId";
-                $votime = time();
-                $res_str = file_get_contents($vourl);
+            }
+        }else if ($MsgType == 'voice') {
+            $access = $this->accessToken();
+            $vourl = "https://api.weixin.qq.com/cgi-bin/media/get?access_token=$access&media_id=$MediaId";
+            $response = $client->get(new Uri($vourl));
+            $headers = $response->getHeaders();
+            $voice_info = $headers['Content-disposition'][0];
+            $voice_name = rtrim(substr($voice_info, -20), '"');
+            $new_voice_name = "/tmp/voice/" . date("Y-m-d H:i:s") . $voice_name;
 
-                file_put_contents("/tmp/voice/$votime.mp3", $res_str, FILE_APPEND);
+            $vors = Storage::put($new_voice_name, $response->getBody());
+            //print_r($vors);exit;
+//            $time = time();
+//            $res_str = file_get_contents($url);
+//
+//            file_put_contents("/tmp/image/$time.jpg", $res_str, FILE_APPEND);
+            if ($vors == '1') {
+                //echo '1111';exit;
+                $dataInfo = [
+                    "nickname" => $userInfo['nickname'],
+                    "openid" => $openid1,
+                    "voice" => $new_voice_name
+                ];
+                //var_dump($dataInfo);exit;
+                $imginfo = DB::table('voice')->insert($dataInfo);
             }
         }
     }
@@ -181,7 +227,7 @@ class WeixinController extends Controller
         $strJson = json_encode($arr,JSON_UNESCAPED_UNICODE);
         $objurl = new Client();
         $response = $objurl->request('POST',$url,[
-           'body' => $strJson
+            'body' => $strJson
         ]);
         $res_str = $response->getBody();
         //var_dump($res_str);
