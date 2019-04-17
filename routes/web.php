@@ -19,3 +19,7 @@ Route::any('accessToken','Weixin\WeixinController@accessToken');
 Route::any('userInfo','Weixin\WeixinController@userInfo');
 Route::any('createadd','Weixin\WeixinController@createadd');
 Route::any('openiddo','Weixin\WeixinController@openiddo');
+//微信支付
+Route::any('wpay','Weixin\WeixinController@wpay');
+Route::any('arr2Xml','Weixin\WeixinController@arr2Xml');
+Route::any('notify','Weixin\WeixinController@notify');
