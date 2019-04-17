@@ -23,3 +23,4 @@ Route::any('openiddo','Weixin\WeixinController@openiddo');
 Route::any('wpay','Weixin\WeixinController@wpay');
 Route::any('arr2Xml','Weixin\WeixinController@arr2Xml');
 Route::any('notify','Weixin\WeixinController@notify');
+Route::any('wstatus','Weixin\WeixinController@wstatus');
