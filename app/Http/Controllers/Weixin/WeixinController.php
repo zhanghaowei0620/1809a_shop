@@ -411,13 +411,6 @@ class WeixinController extends Controller
         if($xml->result_code=='SUCCESS' && $xml->return_code=='SUCCESS'){      //微信支付成功回调
             //验证签名
             $sign = true;
-            if($sign){       //签名验证成功
-                //TODO 逻辑处理  订单状态更新
-            }else{
-                //TODO 验签失败
-                echo '验签失败，IP: '.$_SERVER['REMOTE_ADDR'];
-                // TODO 记录日志
-            }
         }
         $response = '<xml><return_code><![CDATA[SUCCESS]]></return_code><return_msg><![CDATA[OK]]></return_msg></xml>';
         echo $response;
