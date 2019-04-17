@@ -19,7 +19,7 @@ class WeixinController extends Controller
 {
     public function accessToken()
     {
-        //Cache::pull('access');exit;
+        Cache::pull('access');exit;
         $access = Cache('access');
         if (empty($access)) {
             $appid = "wx51db63563c238547";
@@ -417,71 +417,60 @@ class WeixinController extends Controller
     }
 
     public function wstatus(Request $request){
-        $xml = file_get_contents("php://input");
-        $arr = json_decode(json_encode(simplexml_load_string($xml,'SimpleXMLElement',LIBXML_NOCDATA)),true);
-        file_put_contents("/tmp/weixin.log",var_export($arr,true),FILE_APPEND);
+        $data = file_get_contents("php://input");
+        //记录日志
+        $log_str = date('Y-m-d H:i:s') . "\n" . $data . "\n<<<<<<<";
+        file_put_contents('/tmp/weixin.log',$log_str,FILE_APPEND);
+        $xml = simplexml_load_string($data);
+        if($xml->result_code=='SUCCESS' && $xml->return_code=='SUCCESS'){      //微信支付成功回调
+            //验证签名
+            $sign = true;
+            $order_no = $log_str['out_trade_no'];
+            if($sign){
+                $datas = [
+                    'type'=>"微信",
+                    'status'=>2
+                ];
+                DB::table('order')->where('order_no',$order_no)->update($datas);
 
-        $sign = $arr['sign'];
-        $signs = "weixin:$sign\n";
-        unset($arr['sign']);
-        $newsStr = $this->checksign($arr);
-        $newsStr = strtoupper($newsStr);
-        $newsStrs= "localhost:{$newsStr}\n";
-        file_put_contents("/tmp/sign.log",$signs,FILE_APPEND);
-        file_put_contents("/tmp/sign.log",$newsStrs,FILE_APPEND);
+                $orderDetailInfo=DB::table('order_detail')->where('order_no',$order_no)->get();
+                foreach($orderDetailInfo as $k=>$v){
+                    $goodsInfo=DB::table('goods')->where('goods_id',$v->goods_id)->first();
+                    $goods_num=$goodsInfo->goods_num - $v->buy_number;
+                    $goodsUpdate=DB::table('goods')->where('goods_id',$v->goods_id)->update(['goods_num'=>$goods_num]);
+                    $openid = "o4rK85pje4sMiHfs9F9aFmTvDn3U";
+                    //print_r($arr->openid);exit;
+                    $objurl = new \curl();
+                    $accessToken = $this->accessToken();
+                    $url = "https://api.weixin.qq.com/cgi-bin/message/template/send?access_token=$accessToken";
 
-
-        $order_no = $arr['out_trade_no'];
-        if($sign==$newsStr){
-            $datas = [
-                'type'=>"微信",
-                'status'=>2
-            ];
-            DB::table('order')->where('order_no',$order_no)->update($datas);
-
-            $orderDetailInfo=DB::table('order_detail')->where('order_no',$order_no)->get();
-            foreach($orderDetailInfo as $k=>$v){
-                $goodsInfo=DB::table('goods')->where('goods_id',$v->goods_id)->first();
-                $goods_num=$goodsInfo->goods_num - $v->buy_number;
-                $goodsUpdate=DB::table('goods')->where('goods_id',$v->goods_id)->update(['goods_num'=>$goods_num]);
-
-
-
-
-
-                $openid = "o4rK85pje4sMiHfs9F9aFmTvDn3U";
-                //print_r($arr->openid);exit;
-                $objurl = new \curl();
-                $accessToken = $this->accessTokenbb();
-                $url = "https://api.weixin.qq.com/cgi-bin/message/template/send?access_token=$accessToken";
-
-                $url2 = "https://api.weixin.qq.com/cgi-bin/user/info?access_token=$accessToken&openid=$openid&lang=zh_CN";
-                $bol2 = $objurl->sendGet($url2);
-                $strjson = json_decode($bol2,JSON_UNESCAPED_UNICODE);
-                $nickname = $strjson['nickname'];
-                $arr = array(
-                    'touser'=>$openid,
-                    'template_id'=>"skIxpTGsa97WKN_OjbBWpG6ViwkWujElgYlJ6NFwk18",
-                    'data'=>array(
-                        'name'=>array(
-                            'value'=>$goodsInfo->goods_name,
+                    $url2 = "https://api.weixin.qq.com/cgi-bin/user/info?access_token=$accessToken&openid=$openid&lang=zh_CN";
+                    $bol2 = $objurl->sendGet($url2);
+                    $strjson = json_decode($bol2,JSON_UNESCAPED_UNICODE);
+                    $nickname = $strjson['nickname'];
+                    $arr = array(
+                        'touser'=>$openid,
+                        'template_id'=>"skIxpTGsa97WKN_OjbBWpG6ViwkWujElgYlJ6NFwk18",
+                        'data'=>array(
+                            'name'=>array(
+                                'value'=>$goodsInfo->goods_name,
+                            ),
+                            'age'=>array(
+                                'value'=>"支付成功"
+                            ),
                         ),
-                        'age'=>array(
-                            'value'=>"支付成功"
-                        ),
-                    ),
-                );
-                $strjson = json_encode($arr,JSON_UNESCAPED_UNICODE);
-                $bol = $objurl->sendPost($url,$strjson);
+                    );
+                    $strjson = json_encode($arr,JSON_UNESCAPED_UNICODE);
+                    $bol = $objurl->sendPost($url,$strjson);
+                }
+            }else{
+                $datas = [
+                    'type'=>"微信",
+                    'status'=>0
+                ];
+                DB::table('order')->where('order_no',$order_no)->update($datas);
             }
-        }else{
-            $datas = [
-                'type'=>"微信",
-                'status'=>0
-            ];
-            DB::table('order')->where('order_no',$order_no)->update($datas);
         }
-
     }
 
 }
