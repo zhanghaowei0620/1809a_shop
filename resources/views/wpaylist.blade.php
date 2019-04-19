@@ -26,6 +26,20 @@
         correctLevel : QRCode.CorrectLevel.H
     });
 
+    setInterval(function(){
+        $.ajax({
+            url : 'paySuccess',
+            type: 'get',
+            dataType:'json',
+            success: function(d){
+                if(d.status==0){
+                    alert("支付成功");
+                    location.href = "paySuccess?oid={{$oid}}";
+                }
+            }
+        });
+    },2000)
+
     //qrcode.clear();
     //qrcode.makeCode('new $wpayurl');
 </script>

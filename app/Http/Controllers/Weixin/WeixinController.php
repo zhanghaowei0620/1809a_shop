@@ -401,23 +401,6 @@ class WeixinController extends Controller
     /**
      * 微信支付回调
      */
-    public function notify()
-    {
-        $data = file_get_contents("php://input");
-        //记录日志
-        $log_str = date('Y-m-d H:i:s') . "\n" . $data . "\n<<<<<<<";
-        file_put_contents('/tmp/wx_pay_notice.log',$log_str,FILE_APPEND);
-        $xml = simplexml_load_string($data);
-        if($xml->result_code=='SUCCESS' && $xml->return_code=='SUCCESS'){      //微信支付成功回调
-            //验证签名
-            $sign = true;
-        }
-        $response = '<xml><return_code><![CDATA[SUCCESS]]></return_code><return_msg><![CDATA[OK]]></return_msg></xml>';
-        echo $response;
-    }
-
-
-
     public function wstatus(Request $request){
         $xml = file_get_contents("php://input");
         $arr = json_decode(json_encode(simplexml_load_string($xml,'SimpleXMLElement',LIBXML_NOCDATA)),true);
@@ -474,6 +457,7 @@ class WeixinController extends Controller
                     'body' => $strjson
                 ]);
                 $res_str = $response->getBody();
+                echo "支付成功";
                 //var_dump($res_str);
                 return $res_str;
             }
@@ -493,6 +477,42 @@ class WeixinController extends Controller
         $strParams.= "&key=$key";
         $endStr = md5($strParams);
         return $endStr;
+    }
+    /**提示支付成功*/
+    public function paySuccess()
+    {
+        $oid = $_GET['oid'];
+        echo 'OID: '.$oid . "支付成功";
+    }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    public function notify()
+    {
+        $data = file_get_contents("php://input");
+        //记录日志
+        $log_str = date('Y-m-d H:i:s') . "\n" . $data . "\n<<<<<<<";
+        file_put_contents('/tmp/wx_pay_notice.log',$log_str,FILE_APPEND);
+        $xml = simplexml_load_string($data);
+        if($xml->result_code=='SUCCESS' && $xml->return_code=='SUCCESS'){      //微信支付成功回调
+            //验证签名
+            $sign = true;
+        }
+        $response = '<xml><return_code><![CDATA[SUCCESS]]></return_code><return_msg><![CDATA[OK]]></return_msg></xml>';
+        echo $response;
     }
 
 }
