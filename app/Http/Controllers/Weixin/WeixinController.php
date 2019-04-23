@@ -478,12 +478,6 @@ class WeixinController extends Controller
         $endStr = md5($strParams);
         return $endStr;
     }
-    /**提示支付成功*/
-    public function paySuccess()
-    {
-        $oid = $_GET['oid'];
-        echo 'OID: '.$oid . "支付成功";
-    }
 
 
 
