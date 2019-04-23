@@ -30,4 +30,9 @@ class JssdkController extends Controller
         ];
         return view('weixin.jsdemo',$data);
     }
+
+    public function getImg()
+    {
+        echo '<pre>';print_r($_GET);echo '</pre>';
+    }
 }
