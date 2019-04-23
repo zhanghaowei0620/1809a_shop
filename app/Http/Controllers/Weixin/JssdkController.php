@@ -26,7 +26,7 @@ class JssdkController extends Controller
             'signature'=>$sign,
         ];
         $data = [
-            '$js_config'=>$js_config
+            'js_config'=>$js_config
         ];
         return view('weixin.jsdemo',$data);
     }
