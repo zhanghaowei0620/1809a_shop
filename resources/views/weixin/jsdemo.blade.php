@@ -20,7 +20,7 @@
 <img src="" alt="" id="imgs2">
 
 <script src="/js/jquery.min.js"></script>
-<script src="http://res2.wx.qq.com/open/js/jweixin-1.4.0.js "></script>
+<script src="http://res2.wx.qq.com/open/js/jweixin-1.4.0.js"></script>
 <script>
     wx.config({
         debug: true, // 开启调试模式,调用的所有api的返回值会在客户端alert出来，若要查看传入的参数，可以在pc端打开，参数信息会通过log打出，仅在pc端时才会打印。
@@ -42,10 +42,20 @@
                     $.each(localIds,function(i,v){
                         img += v+',';
                         var node = "#imgs"+i;
-                        $(node).attr('src'.v);
+                        $(node).attr('src',v);
+                        //上传图片
+                        wx.uploadImage({
+                            localId: v,
+                            isShowProgressTips: 1,
+                            success: function (res1) {
+                                var serverId = res1.serverId;
+                                //alert('serverID: '+ serverId);
+                                console.log(res1);
+                            }
+                        });
                     })
                     $.ajax({
-                        url : 'getImg?img='+img,
+                        url : 'getImg?img='+img,     //将上传的照片id发送给后端
                         type: 'get',
                         success:function(d){
                             console.log(d);
