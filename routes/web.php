@@ -30,6 +30,12 @@ Route::any('jsdemo','Weixin\JssdkController@jsdemo');
 Route::get('getImg', 'Weixin\JssdkController@getImg');
 
 
+Route::any('delorder','Weixin\CrontabController@delorder');
+Route::any('wechat','Weixin\WeixinController@wechat');
+Route::any('wechatToken','Weixin\WeixinController@wechatToken');
+
+
+
 
 
 

@@ -36,6 +36,57 @@ class WeixinController extends Controller
 
         return $access;
     }
+    /**微信授权*/
+    public function wechat(){
+        $url = urlencode("http://1809zhanghaowei.comcto.com//wechatToken");
+        $appid = "wx51db63563c238547";
+        $scope = "snsapi_userinfo";
+        $url = "https://open.weixin.qq.com/connect/oauth2/authorize?appid=$appid&redirect_uri=$url&response_type=code&scope=$scope&state=STATE#wechat_redirect";
+
+
+        return view('weixin.wechat',['url'=>$url]);
+    }
+    public function wechatToken(Request $request){
+        $arr = $request->input();
+        $code = $arr['code'];
+        $appid = "wx51db63563c238547";
+        $appkey = "35bdd2d4a7a832b6d20e4ed43017b66e";
+        $accessToken = "https://api.weixin.qq.com/sns/oauth2/access_token?appid=$appid&secret=$appkey&code=$code&grant_type=authorization_code";
+        $info = file_get_contents($accessToken);
+        $arr = json_decode($info,true);
+        $openid = $arr['openid'];
+        //var_dump($openid);exit;
+        $res = DB::table('user')->where('openid',$openid)->first();
+        //var_dump($res);exit;
+        if(empty($res)){
+            $openid = [
+                'openid'=>$openid,
+            ];
+            return view('weixin.wechatToken',['openid'=>$openid]);
+        }else{
+            //           $user_id = $res->user_id;
+//            session(['user_id'=>$user_id]);
+//            $data = DB::table('goods')->where('goods_recommend',1)->limit(2)->get(['goods_id','goods_name','goods_img','goods_selfprice']);
+//
+//            return view('index.index.index',['data'=>$data]);
+//            //print_r($res);
+
+            echo "授权成功";
+
+        }
+    }
+
+
+
+
+
+
+
+
+
+
+
+
     public function xmladd(Request $request)
     {
         $client = new Client();
