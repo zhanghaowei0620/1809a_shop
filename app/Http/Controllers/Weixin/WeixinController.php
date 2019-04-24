@@ -45,12 +45,13 @@ class WeixinController extends Controller
         //var_dump($objxml);
         file_put_contents("/tmp/1809_weixin.log", $str, FILE_APPEND);
 
+
         $Event = $objxml->Event;
         $FromUserName = $objxml->FromUserName;
         $ToUserName = $objxml->ToUserName;
         $MsgType = $objxml->MsgType;
         $MediaId = $objxml->MediaId;
-
+        $Content = $objxml->Content;
 
         $access = $this->accessToken();
         $userUrl = "https://api.weixin.qq.com/cgi-bin/user/info?access_token=$access&openid=$FromUserName&lang=zh_CN";
@@ -106,48 +107,39 @@ class WeixinController extends Controller
 
 
         if($MsgType=='text'){
-            $city = explode('+',$objxml->Content)[0];
-            //echo 'city: '.$city;
-            $url = "https://free-api.heweather.net/s6/weather/now?key=HE1904161132041607&location=".$city;
-            $arr = json_decode(file_get_contents($url),true);
-            //echo '<pre>';print_r($arr);echo '</pre>';
-            $f1 = $arr['HeWeather6'][0]['basic']['location'];//城市
-            $wind_dir = $arr['HeWeather6'][0]['now']['wind_dir'];//风向
-            $wind_sc = $arr['HeWeather6'][0]['now']['wind_sc'];//风力
-            $tmp = $arr['HeWeather6'][0]['now']['tmp'];//温度
-            $hum = $arr['HeWeather6'][0]['now']['hum'];//湿度
+            if($Content == '最新商品'){
+                $goodsHotInfo=DB::table('goods')->orderBy('create_time','desc')->limit(5)->get(['goods_id','goods_name','goods_img','goods_selfprice'])->toArray();
+                $goods_id = $goodsHotInfo[0]->goods_id;
+                $ToUserName = $FromUserName;
+                $FormUserName = "gh_cf7ceceb3c6e";
+                $CreateTime = time();
+                $MsgType = 'news';
+                $ArticleCount = 1;
+                $Titkle = '最新消息';
+                $Description = '最新商品信息';
+                $PicUrl = 'https://ss2.bdstatic.com/70cFvnSh_Q1YnxGkpoWK1HF6hhy/it/u=4224459274,772817564&fm=27&gp=0.jpg';
+                $Url = 'http://1809zhanghaowei.comcto.com//goodsList?goods_id='.$goods_id;
 
-            $str = "城市: ".$f1."\n" . "风向: ".$wind_dir ."\n" ."风力：" .$wind_sc."\n" ."温度: ".$tmp."\n" . "湿度: " .$hum."\n";
-            $time = time();
-            $response_xml = "
+                $response_xml = "
                 <xml>
-                    <ToUserName><![CDATA[$FromUserName]]></ToUserName>
-                    <FromUserName><![CDATA[$ToUserName]]></FromUserName>
-                    <CreateTime>$time</CreateTime>
-                    <MsgType><![CDATA[text]]></MsgType>
-                    <Content><![CDATA[".$str."]]></Content>
+                     <ToUserName><![CDATA[$ToUserName]]></ToUserName>
+                     <FromUserName><![CDATA[$FormUserName]]></FromUserName>
+                     <CreateTime>$CreateTime</CreateTime>
+                     <MsgType><![CDATA[$MsgType]]></MsgType>
+                     <ArticleCount>$ArticleCount</ArticleCount>
+                     <Articles>
+                          <item>
+                               <Title><![CDATA[$Titkle]]></Title>
+                               <Description><![CDATA[$Description]]></Description>
+                               <PicUrl><![CDATA[$PicUrl]]></PicUrl>
+                               <Url><![CDATA[$Url]]></Url>
+                          </item>
+                     </Articles>
                 </xml>
                 ";
-            echo $response_xml;
+                echo $response_xml;
+            }
 
-
-
-
-
-
-
-
-            $content = $objxml->Content;
-            $openid = $objxml->FromUserName;
-            $createtime = $objxml->CreateTime;
-
-            $arr = [
-                'content'=>$content,
-                'openid'=>$openid,
-                'createtime'=>$createtime
-            ];
-
-            $info =DB::table('content')->insert($arr);
 
         }else if($MsgType=='image') {
             $access = $this->accessToken();

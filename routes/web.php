@@ -28,3 +28,11 @@ Route::any('paySuccess','Weixin\WeixinController@paySuccess');
 Route::any('jsdemo','Weixin\JssdkController@jsdemo');
 
 Route::get('getImg', 'Weixin\JssdkController@getImg');
+
+
+
+
+
+
+
+
