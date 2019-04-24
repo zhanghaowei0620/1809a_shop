@@ -25,10 +25,23 @@ class JssdkController extends Controller
             'nonceStr'=>$nonceStr,
             'signature'=>$sign,
         ];
-        $data = [
-            'js_config'=>$js_config
+        $goodsHotInfo=DB::table('goods')->orderBy('create_time','desc')->limit(1)->get(['goods_id','goods_name','goods_img','goods_selfprice'])->toArray();
+        //print_r($goodsHotInfo);exit;
+        $goods_id = $goodsHotInfo[0]->goods_id;
+        $update = [
+            'title'=>'最新消息',
+            'desc'=>'最新商品信息',
+            'link'=>'http://1809zhanghaowei.comcto.com/jsdemo?goods='.$goods_id,
+            'imgUrl'=>'https://ss1.bdstatic.com/70cFuXSh_Q1YnxGkpoWK1HF6hhy/it/u=4096777492,3696807149&fm=26&gp=0.jpg'
         ];
-        return view('weixin.jsdemo',$data);
+        $data = [
+            'js_config'=>$js_config,
+            'update'=>$update,
+            'goodsdata'=>$goodsHotInfo
+        ];
+        return view('weixin.goodsdetail',$data);
+
+        //return view('weixin.jsdemo',$data);
     }
 
     public function getImg()

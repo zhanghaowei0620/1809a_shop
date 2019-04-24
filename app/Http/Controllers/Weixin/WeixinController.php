@@ -118,7 +118,7 @@ class WeixinController extends Controller
                 $Titkle = '最新消息';
                 $Description = '最新商品信息';
                 $PicUrl = 'https://ss2.bdstatic.com/70cFvnSh_Q1YnxGkpoWK1HF6hhy/it/u=4224459274,772817564&fm=27&gp=0.jpg';
-                $Url = 'http://1809zhanghaowei.comcto.com//goodsList?goods_id='.$goods_id;
+                $Url = 'http://1809zhanghaowei.comcto.com/jsdemo?goods='.$goods_id;
 
                 $response_xml = "
                 <xml>
