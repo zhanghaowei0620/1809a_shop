@@ -24,7 +24,7 @@ class WeixinController extends Controller
         if (empty($access)) {
 //            $appid = "wx51db63563c238547";
 //            $appkey = "35bdd2d4a7a832b6d20e4ed43017b66e";
-            $url = "https://api.weixin.qq.com/cgi-bin/token?grant_type=client_credential&appid=".env(WX_APP_ID)."&secret=".env(WX_KEY)."";
+            $url = "https://api.weixin.qq.com/cgi-bin/token?grant_type=client_credential&appid=".env('WX_APP_ID')."&secret=".env('WX_KEY')."";
             $info = file_get_contents($url);
             $arrInfo = json_decode($info, true);
             $key = "access";
@@ -41,7 +41,7 @@ class WeixinController extends Controller
         $url = urlencode("http://1809zhanghaowei.comcto.com//wechatToken");
 //        $appid = "wx51db63563c238547";
         $scope = "snsapi_userinfo";
-        $url = "https://open.weixin.qq.com/connect/oauth2/authorize?appid=".env(WX_APP_ID)."&redirect_uri=$url&response_type=code&scope=$scope&state=STATE#wechat_redirect";
+        $url = "https://open.weixin.qq.com/connect/oauth2/authorize?appid=".env('WX_APP_ID')."&redirect_uri=$url&response_type=code&scope=$scope&state=STATE#wechat_redirect";
 
 
         return view('weixin.wechat',['url'=>$url]);
@@ -55,7 +55,7 @@ class WeixinController extends Controller
         $user_id = '15';
 //        $appid = "wx51db63563c238547";
 //        $appkey = "35bdd2d4a7a832b6d20e4ed43017b66e";
-        $accessToken = "https://api.weixin.qq.com/sns/oauth2/access_token?appid=".env(WX_APP_ID)."&secret=".env(WX_KEY)."&code=$code&grant_type=authorization_code";
+        $accessToken = "https://api.weixin.qq.com/sns/oauth2/access_token?appid=".env('WX_APP_ID')."&secret=".env('WX_KEY')."&code=$code&grant_type=authorization_code";
         $info = file_get_contents($accessToken);
         $arr = json_decode($info,true);
         //var_dump($arr);exit;
