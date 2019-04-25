@@ -22,9 +22,9 @@ class WeixinController extends Controller
         //Cache::pull('access');exit;
         $access = Cache('access');
         if (empty($access)) {
-            $appid = "wx51db63563c238547";
-            $appkey = "35bdd2d4a7a832b6d20e4ed43017b66e";
-            $url = "https://api.weixin.qq.com/cgi-bin/token?grant_type=client_credential&appid=$appid&secret=$appkey";
+//            $appid = "wx51db63563c238547";
+//            $appkey = "35bdd2d4a7a832b6d20e4ed43017b66e";
+            $url = "https://api.weixin.qq.com/cgi-bin/token?grant_type=client_credential&appid=".env(WX_APP_ID)."&secret=".env(WX_KEY)."";
             $info = file_get_contents($url);
             $arrInfo = json_decode($info, true);
             $key = "access";
@@ -39,40 +39,53 @@ class WeixinController extends Controller
     /**微信授权*/
     public function wechat(){
         $url = urlencode("http://1809zhanghaowei.comcto.com//wechatToken");
-        $appid = "wx51db63563c238547";
+//        $appid = "wx51db63563c238547";
         $scope = "snsapi_userinfo";
-        $url = "https://open.weixin.qq.com/connect/oauth2/authorize?appid=$appid&redirect_uri=$url&response_type=code&scope=$scope&state=STATE#wechat_redirect";
+        $url = "https://open.weixin.qq.com/connect/oauth2/authorize?appid=".env(WX_APP_ID)."&redirect_uri=$url&response_type=code&scope=$scope&state=STATE#wechat_redirect";
 
 
         return view('weixin.wechat',['url'=>$url]);
     }
     public function wechatToken(Request $request){
+        $access = $this->accessToken();
         $arr = $request->input();
+        //var_dump($arr);exit;
+
         $code = $arr['code'];
-        $appid = "wx51db63563c238547";
-        $appkey = "35bdd2d4a7a832b6d20e4ed43017b66e";
-        $accessToken = "https://api.weixin.qq.com/sns/oauth2/access_token?appid=$appid&secret=$appkey&code=$code&grant_type=authorization_code";
+        $user_id = '15';
+//        $appid = "wx51db63563c238547";
+//        $appkey = "35bdd2d4a7a832b6d20e4ed43017b66e";
+        $accessToken = "https://api.weixin.qq.com/sns/oauth2/access_token?appid=".env(WX_APP_ID)."&secret=".env(WX_KEY)."&code=$code&grant_type=authorization_code";
         $info = file_get_contents($accessToken);
         $arr = json_decode($info,true);
+        //var_dump($arr);exit;
         $openid = $arr['openid'];
-        //var_dump($openid);exit;
-        $res = DB::table('user')->where('openid',$openid)->first();
-        //var_dump($res);exit;
+        $userUrl = "https://api.weixin.qq.com/cgi-bin/user/info?access_token=$access&openid=$openid&lang=zh_CN";
+        $userAccessInfo = file_get_contents($userUrl);
+        $userInfo = json_decode($userAccessInfo, true);
+        //var_dump($userInfo);exit;
+        $name = $userInfo['nickname'];
+        $sex = $userInfo['sex'];
+        $headimgurl = $userInfo['headimgurl'];
+        $updatedata = [
+            'openid'=>$openid
+        ];
+
+        $wechatdata = [
+            'user_name'=>$name,
+            'user_sex'=>$sex,
+            'headimgurl'=>$headimgurl,
+            'openid'=>$openid
+        ];
+
+
+        $res = DB::table('wechat')->where('openid',$openid)->first();
         if(empty($res)){
-            $openid = [
-                'openid'=>$openid,
-            ];
-            return view('weixin.wechatToken',['openid'=>$openid]);
-        }else{
-            //           $user_id = $res->user_id;
-//            session(['user_id'=>$user_id]);
-//            $data = DB::table('goods')->where('goods_recommend',1)->limit(2)->get(['goods_id','goods_name','goods_img','goods_selfprice']);
-//
-//            return view('index.index.index',['data'=>$data]);
-//            //print_r($res);
-
+            DB::table('wechat')->insert($wechatdata);
+            DB::table('user')->where('user_id',$user_id)->update($updatedata);
             echo "授权成功";
-
+        }else{
+            echo "欢迎回来";
         }
     }
 
@@ -521,17 +534,6 @@ class WeixinController extends Controller
         $endStr = md5($strParams);
         return $endStr;
     }
-
-
-
-
-
-
-
-
-
-
-
 
 
 
